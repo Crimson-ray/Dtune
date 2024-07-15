@@ -1,0 +1,56 @@
+<% layout('./layouts/boilerplate1') %>
+ <div class="grid grid-cols-3 lg:columns-lg :columns-md :columns-sm my-10 ">
+    <div class="rounded shadow-lg bg-gray-600  mx-auto col-start-2  justify-center items-center">
+        <div class="rounded shadow-lg bg-white my-20 mx-10" style="width:200px;">
+            <img class="w-100 h-100" src="<%= playlist.image %>" alt="" onerror="this.onerror=null;this.src='https://t3.ftcdn.net/jpg/02/72/14/56/360_F_272145619_0msru0f2296jsjEliBht6ZcdUjqZwLZn.jpg';">
+            <div class="px-6 py-4 mx-auto">
+                <div class="font-bold text-center md:text-md lg:text-lg mb-1 w-200 h-10"><%= playlist.name %></div>
+            </div>
+            <div  class="font-bold text-center w-100 h-10" style="margin-bottom: 1px;">
+                <button id="playlistPlayerButton" class="play"><i class="fa fa-play" style="font-size: 24px;"></i></button>
+            </div>
+        </div>
+        <audio id="playlistPlayer" data-tracks='<%= JSON.stringify(trackUrl) %>' controls style="display: none;margin: 0%;">
+            <source>
+            Your browser does not support the audio element.
+       </audio>
+ </div>
+</div>
+ <h1>Playlist</h1>
+ <div class="playlistSong" id="<%= playlist._id %>">
+     <% playlist.songIds.forEach(function(track) { %>
+         <div class="song" id="<%= track.trackId %>" >
+             <p><strong>Name:</strong> <%= track.trackName %></p>
+             <button class="likeButton" id="<%= track.trackId%>" data-liked="<%= track.liked %>">
+                 <% if (track.liked === true) { %>
+                     <i class="fa fa-heart" style="color: #f33f7e;"></i>
+                 <% } else { %>
+                     <i class="fa fa-heart" style="color: #6a6064dd;"></i>
+                 <% } %>
+             </button>
+             <button class="dislikeButton" id="<%= track.trackId %>" data-disliked="<%= track.disliked %>">
+             <% if (track.disliked === true) { %>
+                 <i class="fa fa-heart" style="color: #000000;"></i>
+             <% } else { %>
+                 <i class="fa fa-heart" style="color: #6a6064dd;"></i>
+             <% } %>
+             </button>
+             <button id="playlistButton">
+             <i class="fa fa-plus" style="font-size: 20px;"></i>
+             </button>
+             <div class="relative right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 hidden" id="playlist-menu" >
+             <% user.playlists.forEach(playlist => { %>
+             <label>
+                 <input type="checkbox" class="playlist-checkbox" data-preview-url="<%= track.trackUrl %>" data-playlist-id="<%= playlist._id %>" data-track-name=" <%= track.trackName %>" data-track-id="<%=track.trackId %>"  <%= playlist.songIds && playlist.songIds.some(song => song.trackId === track.trackId) ? 'checked' : ''%>>
+                 <%= playlist.name %>
+             </label>
+             <% }); %>
+             </div>
+             <button class="play-button" data-preview-url="<%= track.trackUrl %>"><i class="fa fa-play-circle-o"></i></button>
+             <audio controls style="display: none;">
+                 <source src="<%= track.trackUrl %>">
+                 Your browser does not support the audio element.
+             </audio>
+         </div>
+     <% }); %>
+     </div>

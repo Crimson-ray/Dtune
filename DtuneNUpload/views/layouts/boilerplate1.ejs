@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .song {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body style="width: 100%;">
+    <%- include('../partials/searchbar') %>
+    <%- include('../partials/flash') %>
+    <%- body %>
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const playButtons = document.querySelectorAll('.play-button');
+            playButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const playlistPlayerButton=document.querySelector('#playlistPlayerButton')
+                    if(playlistPlayerButton){
+                        playlistPlayerButton.classList.remove('pause')
+                        playlistPlayerButton.classList.add('play')
+                    }
+                    document.querySelectorAll('audio').forEach(audio=>{
+                        if(this.parentElement.querySelector('audio')!==audio){
+                        audio.style.display='none'
+                        audio.pause()
+                        audio.currentTime=0;
+                        }
+                    })
+                    if(this.parentElement.querySelector('audio').style.display==='block'){
+                       this.parentElement.querySelector('audio').style.display='none'
+                       this.parentElement.querySelector('audio').pause()
+                       this.parentElement.querySelector('audio').currentTime=0
+                    }
+                    else{
+                         this.parentElement.querySelector('audio').style.display='block'
+                         this.parentElement.querySelector('audio').play()
+                    }
+                });
+            });
+        });
+        const button=document.querySelector('#profile')
+        button.addEventListener('click',(e)=>{
+            document.querySelector('#dropdown-menu').classList.toggle('hidden')
+        })
+        const playListButtons=document.querySelectorAll("#playlistButton")
+        playListButtons.forEach(button=>{
+              button.addEventListener('click',function(e){
+            this.parentElement.querySelector('#playlist-menu').classList.toggle('hidden')
+        })
+        })
+        const likeButtons = document.querySelectorAll('.likeButton');
+            likeButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                    const trackId = this.id
+                    const dislikeButton=this.parentElement.querySelector('.dislikeButton')
+                    dislikeButton.dataset.disliked =false
+                    dislikeButton.innerHTML='<i class="fa fa-heart" style="color: #6a6064dd;"></i>'
+                    if (this.dataset.liked === 'true') {
+                        like = false; 
+                        this.innerHTML='<i class="fa fa-heart" style="color: #6a6064dd;"></i>'
+                        this.dataset.liked =false
+                    } 
+                    else{
+                         like = true; 
+                         this.innerHTML=' <i class="fa fa-heart" style="color: #f33f7e;"></i>'
+                         this.dataset.liked =true
+
+                    }
+                    try {
+                        const response = await fetch(`/auth/like?trackId=${trackId}&like=${like}&dislike=${false}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to like track');
+                        }
+
+                        const data = await response.json();
+                        console.log('Track liked successfully:', data);
+                    } catch (error) {
+                        console.error('Error liking track:', error);
+                    }
+                });
+            });
+            const dislikeButtons = document.querySelectorAll('.dislikeButton');
+            dislikeButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                    const trackId = this.id
+                    const likeButton=this.parentElement.querySelector('.likeButton')
+                    likeButton.dataset.liked =false
+                    likeButton.innerHTML='<i class="fa fa-heart" style="color: #6a6064dd;"></i>'
+                    if (this.dataset.disliked === 'true') {
+                        dislike = false; 
+                        this.innerHTML='<i class="fa fa-heart" style="color: #6a6064dd;"></i>'
+                        this.dataset.disliked =false
+                    } 
+                    else{
+                         dislike = true; 
+                         this.innerHTML=' <i class="fa fa-heart" style="color: #000000;"></i>'
+                         this.dataset.disliked =true
+                    }
+                    try {
+                        const response = await fetch(`/auth/like?trackId=${trackId}&dislike=${dislike}&like=${false}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to like track');
+                        }
+
+                        const data = await response.json();
+                        console.log('Track liked successfully:', data);
+                    } catch (error) {
+                        console.error('Error liking track:', error);
+                    }
+                });
+            });
+            const playlistCheckboxes=document.querySelectorAll('.playlist-checkbox')
+            playlistCheckboxes.forEach(checkbox=>{
+                checkbox.addEventListener('change',async function(e){
+                    const trackName=this.dataset.trackName
+                    const trackId = this.dataset.trackId;
+                    const trackUrl= this.dataset.previewUrl;
+                    const playlistId = this.dataset.playlistId;
+                    const action = this.checked ? 'add' : 'remove';
+                    const page=document.querySelector('.playlistSong')
+                    console.dir(page)
+                    if(page){
+                         if(page.id===playlistId){
+                            document.querySelectorAll('.song').forEach(song=>{
+                                if(song.id===trackId){
+                                    song.remove()
+                                }
+                            })
+                         }
+                         }
+                    try{
+                        const params = new URLSearchParams({
+                           trackName:trackName,
+                           trackId: trackId,
+                           playlistId: playlistId,
+                           action: action,
+                           trackUrl:trackUrl,
+                             });
+                        const response= await fetch(`/auth/updatePlaylist?${params}`,{
+                            method:'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        })
+                        if(!response.ok){
+                            throw new Error('error')
+                        }
+                    }
+                    catch(e){
+                        console.log('error')
+                    }
+
+                })
+            })
+            const closeButtons= document.querySelectorAll('#Close')
+            closeButtons.forEach(button=>{
+            button.addEventListener('click',function(e){
+            const alert = document.querySelector(this.dataset.dismissTarget)
+            alert.remove()
+            })
+           })
+           const playlistPlayerButton=document.querySelector('#playlistPlayerButton')
+           if(playlistPlayerButton){
+            playlistPlayerButton.addEventListener('click',function(e){
+            const audio=document.querySelector('#playlistPlayer')
+            const tracks=JSON.parse(audio.dataset.tracks)
+            let trackIndex=0
+            if(playlistPlayerButton.classList.contains('play')){
+                document.querySelectorAll('audio').forEach(audio=>{
+                        if(this.parentElement.querySelector('audio')!==audio){
+                        audio.style.display='none'
+                        audio.pause()
+                        audio.currentTime=0;
+                        }
+                    })
+                play(trackIndex)
+                audio.style.display='block'
+            }
+            else{
+                 audio.pause()
+                 audio.style.display='none'
+            }
+            function play(index){
+                if(index<tracks.length){
+                audio.src=tracks[index]
+                audio.play()
+                }
+            }
+            audio.addEventListener('ended',function(e){
+               trackIndex+=1
+                if(trackIndex<tracks.length){
+                    play(trackIndex)
+                }
+            })
+            playlistPlayerButton.classList.toggle('play')
+            playlistPlayerButton.classList.toggle('pause')
+           })
+           }
+           
+    </script>
+</body>
+</html>
+
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .song {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body style="width: 100%;">
+    <%- include('../partials/searchbar') %>
+    <%- include('../partials/flash') %>
+    <%- body %>
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const playButtons = document.querySelectorAll('.play-button');
+            playButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const playlistPlayerButton=document.querySelector('#playlistPlayerButton')
+                    if(playlistPlayerButton.classList.contains('pause')){
+                        playlistPlayerButton.classList.remove('pause')
+                        playlistPlayerButton.classList.add('play')
+                    }
+                    document.querySelectorAll('audio').forEach(audio=>{
+                        if(this.parentElement.querySelector('audio')!==audio){
+                        audio.style.display='none'
+                        audio.pause()
+                        audio.currentTime=0;
+                        }
+                    })
+                    if(this.parentElement.querySelector('audio').style.display==='block'){
+                       this.parentElement.querySelector('audio').style.display='none'
+                       this.parentElement.querySelector('audio').pause()
+                       this.parentElement.querySelector('audio').currentTime=0
+                    }
+                    else{
+                         this.parentElement.querySelector('audio').style.display='block'
+                         this.parentElement.querySelector('audio').play()
+                    }
+                });
+            });
+        });
+        const button=document.querySelector('#profile')
+        button.addEventListener('click',(e)=>{
+            document.querySelector('#dropdown-menu').classList.toggle('hidden')
+        })
+        const playListButtons=document.querySelectorAll("#playlistButton")
+        playListButtons.forEach(button=>{
+              button.addEventListener('click',function(e){
+            this.parentElement.querySelector('#playlist-menu').classList.toggle('hidden')
+        })
+        })
+        const likeButtons = document.querySelectorAll('.likeButton');
+            likeButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                    const trackId = this.id
+                    const dislikeButton=this.parentElement.querySelector('.dislikeButton')
+                    dislikeButton.dataset.disliked =false
+                    dislikeButton.innerHTML='<i class="fa fa-heart" style="color: #6a6064dd;"></i>'
+                    if (this.dataset.liked === 'true') {
+                        like = false; 
+                        this.innerHTML='<i class="fa fa-heart" style="color: #6a6064dd;"></i>'
+                        this.dataset.liked =false
+                    } 
+                    else{
+                         like = true; 
+                         this.innerHTML=' <i class="fa fa-heart" style="color: #f33f7e;"></i>'
+                         this.dataset.liked =true
+
+                    }
+                    try {
+                        const response = await fetch(`/auth/like?trackId=${trackId}&like=${like}&dislike=${false}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to like track');
+                        }
+
+                        const data = await response.json();
+                        console.log('Track liked successfully:', data);
+                    } catch (error) {
+                        console.error('Error liking track:', error);
+                    }
+                });
+            });
+            const dislikeButtons = document.querySelectorAll('.dislikeButton');
+            dislikeButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                    const trackId = this.id
+                    const likeButton=this.parentElement.querySelector('.likeButton')
+                    likeButton.dataset.liked =false
+                    likeButton.innerHTML='<i class="fa fa-heart" style="color: #6a6064dd;"></i>'
+                    if (this.dataset.disliked === 'true') {
+                        dislike = false; 
+                        this.innerHTML='<i class="fa fa-heart" style="color: #6a6064dd;"></i>'
+                        this.dataset.disliked =false
+                    } 
+                    else{
+                         dislike = true; 
+                         this.innerHTML=' <i class="fa fa-heart" style="color: #000000;"></i>'
+                         this.dataset.disliked =true
+                    }
+                    try {
+                        const response = await fetch(`/auth/like?trackId=${trackId}&dislike=${dislike}&like=${false}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to like track');
+                        }
+
+                        const data = await response.json();
+                        console.log('Track liked successfully:', data);
+                    } catch (error) {
+                        console.error('Error liking track:', error);
+                    }
+                });
+            });
+            const playlistCheckboxes=document.querySelectorAll('.playlist-checkbox')
+            playlistCheckboxes.forEach(checkbox=>{
+                checkbox.addEventListener('change',async function(e){
+                    const trackName=this.dataset.trackName
+                    const trackId = this.dataset.trackId;
+                    const trackUrl= this.dataset.previewUrl;
+                    const playlistId = this.dataset.playlistId;
+                    const action = this.checked ? 'add' : 'remove';
+                    const page=document.querySelector('.playlistSong')
+                    console.dir(page)
+                    if(page){
+                         if(page.id===playlistId){
+                            document.querySelectorAll('.song').forEach(song=>{
+                                if(song.id===trackId){
+                                    song.remove()
+                                }
+                            })
+                         }
+                         }
+                    try{
+                        const params = new URLSearchParams({
+                           trackName:trackName,
+                           trackId: trackId,
+                           playlistId: playlistId,
+                           action: action,
+                           trackUrl:trackUrl,
+                             });
+                        const response= await fetch(`/auth/updatePlaylist?${params}`,{
+                            method:'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        })
+                        if(!response.ok){
+                            throw new Error('error')
+                        }
+                    }
+                    catch(e){
+                        console.log('error')
+                    }
+
+                })
+            })
+            const closeButtons= document.querySelectorAll('#Close')
+            closeButtons.forEach(button=>{
+            button.addEventListener('click',function(e){
+            const alert = document.querySelector(this.dataset.dismissTarget)
+            alert.remove()
+            })
+           })
+           const playlistPlayerButton=document.querySelector('#playlistPlayerButton')
+           if(playlistPlayerButton){
+            playlistPlayerButton.addEventListener('click',function(e){
+            const audio=document.querySelector('#playlistPlayer')
+            const tracks=JSON.parse(audio.dataset.tracks)
+            let trackIndex=0
+            if(playlistPlayerButton.classList.contains('play')){
+                document.querySelectorAll('audio').forEach(audio=>{
+                        if(this.parentElement.querySelector('audio')!==audio){
+                        audio.style.display='none'
+                        audio.pause()
+                        audio.currentTime=0;
+                        }
+                    })
+                play(trackIndex)
+                audio.style.display='block'
+            }
+            else{
+                 audio.pause()
+                 audio.style.display='none'
+            }
+            function play(index){
+                if(index<tracks.length){
+                audio.src=tracks[index]
+                audio.play()
+                }
+            }
+            audio.addEventListener('ended',function(e){
+               trackIndex+=1
+                if(trackIndex<tracks.length){
+                    play(trackIndex)
+                }
+            })
+            playlistPlayerButton.classList.toggle('play')
+            playlistPlayerButton.classList.toggle('pause')
+           })
+           }
+           
+    </script>
+</body>
+</html>-->
