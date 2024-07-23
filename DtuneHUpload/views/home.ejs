@@ -1,0 +1,52 @@
+<% if(!user){ %>
+<% layout('layouts/boilerplate') %>
+<%} else{%>
+ <% layout('layouts/boilerplate1') %> 
+ <% } %>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+ <div class="container mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-4">Welcome to Dtune</h1>
+    <p class="mb-4">Discover new songs, create playlists, and enjoy your favorite music.</p>
+</div>
+<section class="mb-4">
+    <h1 class="text-2xl font-semibold mb-4 mx-3">How it works?</h1>
+    <div class="mx-10 text-lg">
+        <h3 class="text-md font-bold">        <i class="fa fa-search mr-1 text-2xl text-blue-500"></i>Search Music</h3>
+        <p>Use our search bar to find your favorite songs, artists, or playlists.</p>
+    </div>
+    <div class="mx-10 text-lg">
+        <h3 class="text-md font-bold"> <i class="fa fa-play mr-1 text-2xl text-blue-500"></i>Play Music</h3>
+        <p>Play your selected songs directly from the app.</p>
+    </div>
+    <div class="mx-10 text-lg">
+        <h3 class="text-md font-bold"> <i class="fa fa-plus mr-1 text-2xl text-blue-500"></i>Create Playlists</h3>
+        <p>Create and manage your own playlists with your favorite tracks.</p>
+    </div>
+    <div class="mx-10 text-lg">
+        <h3 class="text-md font-bold"> <i class="fa fa-link mr-1 text-2xl text-blue-500"></i>Create Playlists</h3>
+        <p>Connect and Listen together with your friends across the world</p>
+    </div>
+</section>
+<section class="mb-4">
+    <h2 class="text-2xl font-semibold mb-4 mx-3">Upcoming Features</h2>
+    <ul class="list-disc list-inside mx-10 space-y-2">
+        <li>Advanced search filters for finding specific tracks.</li>
+        <li>Integration with social media for sharing playlists.</li>
+        <li>Enhanced recommendation engine based on listening habits.</li>
+    </ul>
+</section>
+<section class="mb-8">
+    <h2 class="text-2xl font-semibold mb-4 mx-3">User Feedback</h2>
+    <div class="space-y-5 mx-10">
+        <div class="bg-gray-100 p-4 rounded-lg shadow">
+            <p>"Great app! The playlist feature is really useful."</p>
+            <footer class="mt-2 text-sm">— taylor</footer>
+        </div>
+        <div class="bg-gray-100 p-4 rounded-lg shadow">
+            <p>"I love discovering new music with this app."</p>
+            <footer class="mt-2 text-sm">— mango</footer>
+        </div>
+    </div>
+</section>
+

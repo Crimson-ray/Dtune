@@ -1,0 +1,16 @@
+<% layout('./layouts/boilerplate1') %>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-10 mx-10 w-auto">
+    <% playlists.forEach(playlist => { %>
+        <div class="flex items-center rounded-lg shadow-lg bg-white">
+            <img class="w-24 h-24 object-cover rounded-l-lg" src="<%= playlist.playlist.image %>" alt="<%= playlist.playlist.name %>"  onerror="this.onerror=null;this.src='https://t3.ftcdn.net/jpg/02/72/14/56/360_F_272145619_0msru0f2296jsjEliBht6ZcdUjqZwLZn.jpg';">
+            <div class="flex-grow flex-cols px-6 py-4">
+                <div class="font-bold text-center text-md lg:text-lg mb-2"><%= playlist.playlist.name%></div>
+                <div class="font-bold text-center text-md lg:text-lg mb-2"><%= playlist.playlist.songIds.length %> Songs</div>
+                <div class="font-bold text-center text-md lg:text-lg mb-2"><%= playlist.username %></div>
+            </div>
+            <div class="px-6 py-4">
+                <a href="/auth/PublicPlaylist/<%=JSON.stringify(playlist.playlist)%>" class="block text-center bg-blue-500 text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-blue-600">View</a>
+            </div>
+        </div>
+    <% }) %>
+</div>
