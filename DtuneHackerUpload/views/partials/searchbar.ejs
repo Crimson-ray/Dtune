@@ -1,0 +1,89 @@
+<div class="w-full h-15 bg-gray-900 p-2 shadow flex justify-between md:block" style="margin-bottom:20px;padding-top:10px;padding-bottom:10px;">
+    <div class="hidden md:flex justify-between items-center">
+        <div><a href="/" target="" class="mr-2 md:mr-3"><i class='fa fa-home' style='color: rgb(231, 227, 234); font-size:30px;'> <span class="inline-flex ml-1 md:text-sm lg:text-base">Home</span></i></a></div>
+        <div><a href="/auth/userPlaylists" class="mr-2 md:mr-3" target=""><i class='fa fa-play' style='color: rgb(231, 227, 234);font-size:30px;'> <span class="inline-flex ml-1 md:text-sm lg:text-base">Playlists</span></i></a></div>
+        <div><a href="/auth/trending" target="" class="mr-2 md:mr-3"><i class='fa fa-bullhorn ' style='color: rgb(231, 227, 234);font-size:30px;'> <span class="inline-flex ml-1 md:text-sm lg:text-base">Trending</span></i></a></div>
+        <form action="/auth/search" method="GET" class="flex items-center w-100 md:w-full max-w-lg mx-auto">
+            <select name="type" class=" h-8 mx-1 px-1 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                <option value="songs" selected>Type</option>
+                <option value="songs">Songs</option>
+                <option value="users">Users</option>
+                <option value="playlists">Playlists</option>
+            </select>
+            <input type="text" name="search" placeholder="Search" class=" h-8 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+            <button type="submit" class="h-8 bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 focus:outline-none">
+                <i class="fa fa-search"></i>
+            </button>
+        </form>
+        <% if(user.isArtist){ %>
+        <div><a href="/" target="" class="mr-2 md:mr-3"><i class='fa fa-music' style='color: rgb(231, 227, 234); font-size:30px;'> <span class="inline-flex ml-1 md:text-sm lg:text-base">Songs</span></i></a></div>
+        <div><a href="/artist/upload" class="mr-2 md:mr-3" target=""><i class='fa fa-cloud-upload' style='color: rgb(231, 227, 234);font-size:30px;'> <span class="inline-flex ml-1 md:text-sm lg:text-base">Upload</span></i></a></div>
+        <% } %>
+        <div><a href="/auth/friends" class="mr-2 md:mr-3"><i class="fa fa-users  mr-2" style='color: rgb(231, 227, 234); font-size:30px;'> <span class="inline-flex ml-1 md:text-sm lg:text-base">Friends</span></i></a></div>
+        <div><a href="/auth/invites" class="mr-2 md:mr-3"><i class="fa fa-send  mr-2" style='color: rgb(231, 227, 234); font-size:30px;'> <span class="inline-flex ml-1 md:text-sm lg:text-base">Invites</span></i></a></div>
+        <div><a href="/auth/friendRequests" target="" class="mr-2 md:mr-3"><i class="fa fa-envelope  mr-2" style='color: rgb(231, 227, 234); font-size:30px;'><span class="inline-flex ml-1 md:text-sm lg:text-base  mr-2">Requests</span></i>
+            <% if(user.friendRequestsReceived.length>0){ %>
+            <span class="sr-only">Notifications</span>
+              <div class="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900"><%=user.friendRequestsReceived.length%></div>
+              <% } %>
+        </a></div>
+        <div class="relative">
+            <button class="flex items-center justify-center h-8 w-8 bg-gray-200 rounded-full p-2  hover:bg-gray-500" id="profile">
+                <i class="fa fa-user-circle text-2xl text-gray-700 "></i>
+            </button>
+            <div class="absolute top-9 right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 hidden" id="dropdown-menu">
+                <a href="users/dashboard" target=""class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
+                <a href="/users/logout" target="" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</a>
+                <a href="/auth/createPlaylist" target="" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Create Playlist</a>
+            </div>
+        </div>
+    </div>
+    <div class="flex flex-col md:hidden w-full">
+        <div class="flex justify-between items-center">
+            <a href="/" class="text-white block pt-2"><i class="fa fa-home mr-2"></i>Home</a>
+            <form action="/auth/search" method="GET" class="flex items-center w-100 md:w-full max-w-lg mx-auto">
+                <select name="type" class=" h-8 mx-1 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                    <option value="" selected>Type</option>
+                    <option value="songs">Songs</option>
+                    <option value="users">Users</option>
+                    <option value="playlists">Playlists</option>
+                </select>
+                <input type="text" name="search" placeholder="Search" class=" h-8 flex-grow px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                <button type="submit" class="h-8 bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 focus:outline-none">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+            <button id="nav-toggle" class="text-white focus:outline-none ml-auto">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="flex flex-col hidden" id="nav-menu">
+            <a href="/" class="text-white block pt-2 hover:bg-gray-500"><i class="fa fa-user mr-2"></i>Profile</a>
+            <a href="/auth/friendRequests" target="" class="text-white block  pt-2 hover:bg-gray-500" >
+                <svg class="w-5 h-5 inline" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 20 16">
+                <path d="m10.036 8.278 9.258-7.79A1.979 1.979 0 0 0 18 0H2A1.987 1.987 0 0 0 .641.541l9.395 7.737Z"/>
+                <path d="M11.241 9.817c-.36.275-.801.425-1.255.427-.428 0-.845-.138-1.187-.395L0 2.6V14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2.5l-8.759 7.317Z"/>
+                </svg>
+                <span>Requests</span>
+                <% if(user.friendRequestsReceived.length>0){ %>
+                <span class="sr-only">Notifications</span>
+                  <div class="relative inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900"><%=user.friendRequestsReceived.length%></div>
+                  <% } %>
+            </a>
+            <% if(user.isArtist){ %>
+            <a href="/" class="text-white block  pt-2 hover:bg-gray-500"><i class="fa fa-music mr-2"></i>Songs</a>
+            <a href="/artist/upload" class="text-white block pt-2 hover:bg-gray-500"><i class="fa fa-cloud-upload mr-2"></i>Upload Song</a>
+            <% } %>
+            <a href="/auth//userPlaylists" class="text-white block pt-2 hover:bg-gray-500"><i class="fa fa-play mr-2"></i>Playlists</a>
+            <a href="/auth/trending" class="text-white block pt-2 hover:bg-gray-500"><i class="fa fa-bullhorn mr-2"></i>Trending</a>
+            <a href="/auth/createPlaylist" class="text-white block pt-2 hover:bg-gray-500"><i class="fa fa-plus  mr-2"></i>Create Playlist</a>
+            <a href="/auth/friends" class="text-white block pt-2 hover:bg-gray-500"><i class="fa fa-users  mr-2"></i>Friends</a>
+            <a href="/auth/invites" class="text-white block pt-2 hover:bg-gray-500"><i class="fa fa-send  mr-2"></i>Invites</a>
+            <a href="/users/logout" class="text-white block pt-2 hover:bg-gray-500"><i class="fa fa-sign-out  mr-2"></i>Logout</a>
+
+        </div>
+    </div>
+</div>
+<div>

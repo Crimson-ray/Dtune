@@ -1,0 +1,44 @@
+<% layout('./layouts/boilerplate1') %>
+    <h1>Playlist</h1>
+    <div id="playlist">
+        <% tracks.forEach(function(track) { %>
+            <% if(track.track.preview_url){ %>
+            <div class="song">
+                <p><strong>Name:</strong> <%= track.track.name %></p>
+                <p><strong>Artist:</strong> <%= track.track.artists.map(artist => artist.name).join(', ') %></p>
+                <button class="likeButton" id="<%= track.track.id %>" data-liked="<%= track.liked %>" data-preview-url="<%= track.track.preview_url%>" data-name="<%= track.track.name %>">
+                    <% if (track.liked === true) { %>
+                        <i class="fa fa-heart" style="color: #f33f7e;"></i>
+                    <% } else { %>
+                        <i class="fa fa-heart" style="color: #6a6064dd;"></i>
+                    <% } %>
+                </button>
+                <button class="dislikeButton" id="<%= track.track.id %>" data-disliked="<%= track.disliked %>" data-preview-url="<%= track.track.preview_url%>" data-name="<%= track.track.name %>">
+                <% if (track.disliked === true) { %>
+                    <i class="fa fa-heart" style="color: #000000;"></i>
+                <% } else { %>
+                    <i class="fa fa-heart" style="color: #6a6064dd;"></i>
+                <% } %>
+                </button>
+                <button id="playlistButton">
+                <i class="fa fa-plus" style="font-size: 20px;"></i>
+                </button>
+                <div class="relative right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 hidden" id="playlist-menu">
+                <% user.playlists.forEach(playlist => { %>
+                    <% if(playlist.name !=='Liked Songs'){ %>
+                <label>
+                    <input type="checkbox" class="playlist-checkbox" data-preview-url="<%= track.track.preview_url %>" data-playlist-id="<%= playlist._id %>" data-track-name=" <%= track.track.name %>" data-track-id="<%=track.track.id %>" <%= playlist.songIds && playlist.songIds.some(song => song.trackId === track.track.id) ? 'checked' : '' %>>
+                    <%= playlist.name %>
+                </label>
+                <% } %>
+                <% }); %>
+                </div>
+                <button class="play-button" data-preview-url="<%= track.track.preview_url %>"><i class="fa fa-play-circle-o"></i></button>
+                <audio controls style="display: none;">
+                    <source src="<%= track.track.preview_url %>">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <% } %>
+        <% }); %>
+    </div>
