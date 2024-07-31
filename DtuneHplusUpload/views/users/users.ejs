@@ -1,0 +1,92 @@
+<% layout('./layouts/boilerplate1') %>
+<h1 class="mx-5"><strong>Users</strong></h1>
+<div id="playlist">
+    <% users.forEach(function(otheruser) { %>
+        <div class="user">
+            <p><strong>Name:</strong> <%= otheruser.username %></p>
+            <p><strong>Email:</strong> <%= otheruser.email %></p>
+            <p><strong>Bio:</strong> <%= otheruser.bio || 'Not available' %></p>
+            <% if(user.friends.includes(otheruser._id)) { %>
+                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-full friendButton my-2" data-user-id="<%= otheruser._id %>" data-status="friend">UnFriend</button>
+            <% } else if(user.friendRequestsSent.includes(otheruser._id)) { %>
+                <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded-full friendButton my-2" data-user-id="<%= otheruser._id %>" data-status="request-sent">Unsend Request</button>
+                <% } else if(user.friendRequestsReceived.includes(otheruser._id)) { %>
+                    <span>Has sent Friend Request</span>
+                    <a class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 my-2" href="/auth/friendRequests">View All Requests</a>
+            <% } else { %>
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded-full friendButton my-2" data-user-id="<%= otheruser._id %>" data-status="not-friend">Add Friend</button>
+            <% } %>
+        </div>
+    <% }); %>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.friendButton').forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = this.getAttribute('data-user-id');
+            const status = this.getAttribute('data-status');
+            let action;
+            let newStatus;
+
+            switch (status) {
+                case 'not-friend':
+                    action = '/auth/sendFriendRequest/' + userId;
+                    newStatus = 'request-sent';
+                    break;
+                case 'request-sent':
+                    action = '/auth/unsendFriendRequest/' + userId;
+                    newStatus = 'not-friend';
+                    break;
+                case 'request-received':
+                    action = '/auth/acceptFriendRequest/' + userId;
+                    newStatus = 'friend';
+                    break;
+                case 'friend':
+                    action = '/auth/unfriend/' + userId;
+                    newStatus = 'not-friend';
+                    break;
+                default:
+                    return;
+            }
+
+            fetch(action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateButtonState(this, newStatus);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred');
+            });
+        });
+    });
+
+    function updateButtonState(button, status) {
+        if (status === 'not-friend') {
+            button.textContent = 'Add Friend';
+            button.classList.remove('bg-gray-500', 'bg-red-500', 'bg-blue-500','hover:bg-blue-700','hover:bg-red-700','hover:bg-gray-700');
+            button.classList.add('bg-blue-500','hover:bg-blue-700');
+        } else if (status === 'request-sent') {
+            button.textContent = 'Unsend Request';
+            button.classList.remove('bg-gray-500', 'bg-red-500', 'bg-blue-500','hover:bg-blue-700','hover:bg-red-700','hover:bg-gray-700');
+            button.classList.add('bg-gray-500','hover:bg-gray-700');
+        }else if (status === 'friend') {
+            button.textContent = 'UnFriend';
+            button.classList.remove('bg-gray-500', 'bg-red-500', 'bg-blue-500','hover:bg-blue-700','hover:bg-red-700','hover:bg-gray-700');
+            button.classList.add('bg-red-500','hover:bg-red-700');
+        }
+        button.setAttribute('data-status', status);
+    }
+});
+
+</script>

@@ -1,0 +1,136 @@
+
+<% layout('./layouts/boilerplate1') %>
+<% if(user.playlists.length ===0){ %>
+    <h1 class="mx-5" style="color: purple;"><strong><a href="/auth/createPlaylist">You Dont Have Playlists.Create Playlists and Party</a></strong></h1>
+    <% } %>
+<h1 class="mx-5"><strong>Friends</strong></h1>
+<% if (friends.length > 0) { %>
+    <% friends.forEach(request => { %>
+    <div class="user">
+    <p><strong>Name:</strong> <%= request.username %></p>
+    <p><strong>Email:</strong> <%= request.email %></p>
+    <p><strong>Bio:</strong> <%= request.bio || 'Not available' %></p>
+    <% if(user.playlists.length >0){ %>
+        <% if(request.playlists.length >0){ %>
+    <% if(user.invitesActive.some(invite=>invite.user.toString()===request._id.toString())){ %>
+        <button class="bg-gray-900 hover:bg-gray-1000 text-white font-bold py-1 px-3 rounded-full my-2 inviteButton" data-user-id="<%= request._id %>" data-name="<%= request.username %>" data-status="leave">Leave Party</button>
+    <%}else if(user.invitesSent.some(invite=>invite.user.toString()===request._id.toString())) { %>
+        <button class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-3 rounded-full my-2 inviteButton" data-user-id="<%= request._id %>" data-name="<%= request.username %>" data-status="invited">Uninvite</button>
+        <% }else if(user.invitesReceived.some(invite=>invite.user.toString()===request._id.toString())){ %>
+            <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-1 px-3 rounded-full my-2 inviteButton" data-user-id="<%= request._id %>" data-name="<%= request.username %>" data-status="accept">Join Party</button>
+            <button class="bg-gray-900 hover:bg-gray-1000 text-white font-bold py-1 px-3 rounded-full my-2 inviteButton decline" data-user-id="<%= request._id %>" data-name="<%= request.username %>" data-status="reject">Decline</button>
+    <% }else{ %>
+        <button class="bg-teal-500 hover:bg-teal-700 text-white font-bold py-1 px-3 rounded-full my-2 inviteButton " data-user-id="<%= request._id %>" data-name="<%= request.username %>" data-status="uninvited">Party Invite</button>
+    <% } %>
+    <select id="selected" name="playlist" class="<%=((user.invitesSent.some(invite => invite.user.toString() === request._id.toString())) || (user.invitesActive.some(invite => invite.user.toString() === request._id.toString())))? 'hidden' : '' %> h-8 mx-1 px-1 ring-2 ring-inset ring-black-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+        <% user.playlists.forEach(playlist => { %>
+           <option value="<%= playlist._id %>"><%= playlist.name %></option>
+        <% }); %>
+    </select>
+    <% }else{ %>
+        <p>Party Mode Unavailable</p>
+    <% } %>
+    <% } %>
+    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-full  my-2" data-id="<%= request._id %>" id="unFriend">UnFriend</button>
+    </div>
+    <% }) %>
+<% } else { %>
+    <p>No friends</p>
+<% } %>
+<script>
+const unFriendButtons=document.querySelectorAll('#unFriend')
+unFriendButtons.forEach(button=>button.addEventListener('click',async function(e){
+    const response = await fetch(`/auth/unFriend/${this.dataset.id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                this.parentElement.remove()
+}))
+document.addEventListener('DOMContentLoaded', function() {
+const selected=document.querySelector('#selected')
+document.querySelectorAll('.inviteButton').forEach(button => {
+button.addEventListener('click', function() {
+    const selected=this.parentElement.querySelector('#selected')
+    const userId = this.getAttribute('data-user-id');
+    const status = this.getAttribute('data-status');
+    let playlist =selected.value
+    let action;
+    let newStatus;
+
+    switch (status) {
+        case 'invited':
+            action = '/auth/uninvite/' + userId;
+            newStatus = 'uninvited';
+            break;
+        case 'uninvited':
+            action = '/auth/invite/' + userId;
+            newStatus = 'invited';
+            break;
+        case 'accept':
+            action='/auth/joinParty/'+userId;
+            newStatus='leave'
+            break;
+        case 'reject':
+            action='/auth/rejectParty/'+userId
+            newStatus='uninvited'
+            break;
+        case 'leave':
+            action='/auth/leaveParty/'+userId
+            newStatus='uninvited'
+            break;
+        default:
+            return;
+    }
+console.log(action)
+    fetch(action, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({playlist})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateButtonState(this, newStatus,selected);
+            alert('Success: ' + playlist);
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('error occurred');
+    });
+});
+});
+
+function updateButtonState(button, status,selected) {
+document.querySelectorAll('.inviteButton').forEach(button => button.classList.add('hidden'))
+if (status === 'invited') {
+    button.dataStatus=status
+    button.textContent = 'Uninvite';
+    button.classList.remove('bg-gray-500', 'bg-teal-500','bg-gray-900','bg-purple-500','hover:bg-teal-700','hover:bg-gray-700','hover:bg-gray-1000','hover:bg-purple-700','hidden');
+    button.classList.add('bg-gray-500','hover:bg-gray-700');
+    selected.classList.add('hidden')
+} else if (status === 'uninvited') {
+    button.dataStatus=status
+    button.textContent = 'Party Invite';
+    button.classList.remove('bg-gray-500', 'bg-teal-500','bg-black-500','bg-purple-500','hover:bg-teal-700','hover:bg-gray-700','hover:bg-black-700','hover:bg-purple-700','hidden');
+    button.classList.add('bg-teal-500','hover:bg-teal-700');
+    selected.classList.remove('hidden')
+}
+else if(status==='leave'){
+    button.dataStatus=status
+    button.textContent = 'Leave Party';
+    button.classList.remove('bg-gray-500', 'bg-teal-500','bg-black-500','bg-purple-500','hover:bg-teal-700','hover:bg-gray-700','hover:bg-black-700','hover:bg-purple-700','hidden');
+    button.classList.add('bg-gray-900','hover:bg-gray-1000');
+    selected.classList.add('hidden')
+}
+button.setAttribute('data-status', status);
+}
+});
+
+</script>

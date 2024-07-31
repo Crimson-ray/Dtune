@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/flash') %>
+    <%- body %>
+</body>
+<script>
+    document.getElementById('nav-toggle').addEventListener('click', function () {
+        var menu = document.getElementById('nav-menu');
+        menu.classList.toggle('hidden');
+    });
+    window.addEventListener('pageshow',(e)=>{
+        if(e.persisted){
+            document.querySelector('form').reset()
+        }
+    })
+    const closeButtons= document.querySelectorAll('#Close')
+    closeButtons.forEach(button=>{
+     button.addEventListener('click',function(e){
+         const alert = this.parentElement
+         document.body.removeChild(alert)
+     })
+     })
+</script>
+</html>

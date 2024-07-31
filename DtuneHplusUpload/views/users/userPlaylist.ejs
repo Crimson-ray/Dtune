@@ -1,0 +1,95 @@
+<% layout('./layouts/boilerplate1') %>
+<div class="flex justify-center my-10">
+    <div class="rounded shadow-lg bg-white my-20" style="width:200px;">
+      <img class="w-100 h-100" src="<%= playlist.image %>" alt="" onerror="this.onerror=null;this.src='https://t3.ftcdn.net/jpg/02/72/14/56/360_F_272145619_0msru0f2296jsjEliBht6ZcdUjqZwLZn.jpg';">
+      <div class="px-6 py-4 mx-auto">
+        <div class="font-bold text-center md:text-md lg:text-lg mb-1 w-200 h-10"><%= playlist.name %></div>
+      </div>
+      <div class="px-6 py-2 mx-auto">
+        <div class="font-bold text-center hidden duration"></div>
+      </div>
+      <div class="font-bold text-center w-100 h-10" style="margin-bottom: 10px;">
+        <button id="playlistPlayerButton" class="play"><i class="fa fa-play" style="font-size: 24px;"></i></button>
+      </div>
+      <audio id="playlistPlayer" data-tracks='<%= JSON.stringify(trackUrl) %>' data-songs="<%= JSON.stringify(tracks) %>" controls style="display: none; position: relative; left: -25%; top: 10px;">
+        <source>
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+  </div>
+  
+</div>
+ <h1>Playlist</h1>
+ <div class="playlistSong" id="<%= playlist._id %>" data-name="<%= playlist.name %>">
+     <% playlist.songIds.forEach(function(track) { %>
+        <div class="song flex flex-col md:flex-row md:justify-between md:items-center rounded-lg shadow" id="<%= track.trackId %>" >
+            <div class="flex mr-2 my-2 flex-row">
+                <div class="mr-2">
+                    <img src="<%= track.trackImage%> " style="max-width: 100px;max-height: 100px;">
+            </div>
+            <div>
+             <p><strong>Name:</strong> <%= track.trackName %></p>
+             <button class="likeButton" id="<%= track.trackId%>" data-liked="<%= track.liked %>" data-preview-url="<%= track.preview_url%>" data-name="<%= track.name %>" data-lyrics="<%=track.trackLyrics %>" data-image="<%= track.trackImage %>">
+                 <% if (track.liked === true) { %>
+                     <i class="fa fa-heart" style="color: #f33f7e;"></i>
+                 <% } else { %>
+                     <i class="fa fa-heart" style="color: #6a6064dd;"></i>
+                 <% } %>
+             </button>
+             <button class="dislikeButton" id="<%= track.trackId %>" data-disliked="<%= track.disliked %>" data-preview-url="<%= track.preview_url%>" data-name="<%= track.name %>" data-lyrics="<%= track.trackLyrics %>" data-image="<%= track.trackImage %>">
+             <% if (track.disliked === true) { %>
+                 <i class="fa fa-heart" style="color: #000000;"></i>
+             <% } else { %>
+                 <i class="fa fa-heart" style="color: #6a6064dd;"></i>
+             <% } %>
+             </button>
+             <button id="playlistButton">
+             <i class="fa fa-plus" style="font-size: 20px;"></i>
+             </button>
+             <div class="relative right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 hidden" id="playlist-menu" >
+             <% user.playlists.forEach(playlist => { %>
+            <% if(playlist.name !=='Liked Songs'){ %>
+             <label>
+                 <input type="checkbox" class="playlist-checkbox" data-lyrics="<%= track.trackLyrics %>" data-image="<%= track.trackImage %>" data-preview-url="<%= track.trackUrl %>" data-playlist-id="<%= playlist._id %>" data-track-name=" <%= track.trackName %>" data-track-id="<%=track.trackId %>"  <%= playlist.songIds && playlist.songIds.some(song => song.trackId === track.trackId) ? 'checked' : ''%>>
+                 <%= playlist.name %>
+             </label>
+             <% } %>
+             <% }); %>
+             </div>
+             <button class="play-button" data-preview-url="<%= track.trackUrl %>" data-track-name=" <%= track.trackName %>" data-track-id="<%=track.trackId %>" data-image="<%= track.trackImage  %>"><i class="fa fa-play-circle-o"></i></button>
+             <audio controls style="display: none;" id="trackAudio">
+                 <source src="<%= track.trackUrl %>">
+                 Your browser does not support the audio element.
+             </audio>
+         </div>
+        </div>
+        <div class="flex flex-col justify-center bg-gray-100 p-4 rounded-lg shadow" >
+           <h1>Lyrics :</h1>
+           <p style="
+           height: 100px; 
+           overflow:-x auto; overflow-y: auto;" class="w-96 h-40" ><%- track.trackLyrics -%></p>
+       </div>
+       </div>
+     <% }); %>
+     </div>
+     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        let duration=0;
+        let loadedCount=0;
+        const audios=document.querySelectorAll("#trackAudio")
+        audios.forEach(audio=>{
+            audio.addEventListener('loadedmetadata', function() {
+                    duration += audio.duration;
+                    loadedCount++;
+                    if(loadedCount===audios.length){
+                       const hours = Math.floor(duration / 3600);
+                       const minutes = Math.floor((duration % 3600) / 60);
+                       const seconds = Math.floor(duration % 60);
+                       const Duration = `Duration:${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                       const disp=document.querySelector('.duration')
+                       disp.innerHTML=Duration
+                       disp.classList.remove('hidden')
+                    }
+        })})
+        })
+     </script>

@@ -1,0 +1,37 @@
+<% layout('./layouts/boilerplate1') %>
+<h1 class="mx-5"><strong>Requests</strong></h1>
+        <% if (friendRequests.length > 0) { %>
+            <% friendRequests.forEach(request => { %>
+            <div class="user">
+            <p><strong>Name:</strong> <%= request.username %></p>
+            <p><strong>Email:</strong> <%= request.email %></p>
+            <p><strong>Bio:</strong> <%= request.bio || 'Not available' %></p>
+            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded-full my-2" id="acceptButton" data-id="<%= request._id %>" data-name="<%= request.username %>">Accept</button>
+            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-full my-2" id="ignoreButton" data-id="<%= request._id %>" data-name="<%= request.username %>">Ignore</button>
+            </div>
+            <% }) %>
+        <% } else { %>
+            <p>No friend requests</p>
+        <% } %>
+    <script>
+        const acceptButtons=document.querySelectorAll('#acceptButton')
+        acceptButtons.forEach(button=>button.addEventListener('click',async function(e){
+            const response = await fetch(`/auth/acceptFriendRequest/${this.dataset.id}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        })
+                        this.parentElement.remove()
+        }))
+        const ignoreButtons=document.querySelectorAll('#ignoreButton')
+        ignoreButtons.forEach(button=>button.addEventListener('click',async function(e){
+            const response = await fetch(`/auth/rejectFriendRequest/${this.dataset.id}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        })
+            this.parentElement.remove()
+        }))
+    </script>

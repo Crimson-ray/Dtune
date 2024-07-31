@@ -1,0 +1,23 @@
+<% layout('./layouts/boilerplate1') %>
+        <h2 class="text-2xl font-semibold mb-4 ml-10">Popular Genres in India</h2>
+        <div class="flex flex-col">
+            <% categories.forEach((category, index) => { %>
+                <% if(index===0){}else{ %>
+                    <h3 class="text-xl font-semibold mb-2 ml-10"><%= category.name %></h3>
+                    <div class="grid md:grid-cols-3 lg:grid-cols-5  sm:grid-cols-2  gap-6 my-10 mx-10 w-auto ">
+                        <% playlists[index].forEach(playlist => { %>
+                            <div class="rounded w-auto shadow-lg bg-white">
+                                <img class="md:w-300 md:h-300 w-full" src="<%= playlist.images[0].url %>" alt="<%= playlist.name %>">
+                                <div class="px-6 py-4 mx-auto">
+                                    <div class="font-bold text-center md:text-sm lg:text-md mb-2 w-200 h-10"><%= playlist.name %></div>
+                                </div>
+                                <div class="px-6 pt-4 pb-2">
+                                    <a href="/auth/playlist/<%=playlist.id%>" class="block text-center w-30 bg-blue-500 text-white rounded-full px-0 py-1 text-sm font-semibold hover:bg-blue-600 mx-auto">View</a>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                    <% } %>
+            <% }) %>
+        </div>
+    </div>
